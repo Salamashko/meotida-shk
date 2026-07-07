@@ -128,7 +128,7 @@
 </head>
 <body>
 <div class="container">
-  <div class="credit">Разработано Викторией Саламашко · v1 · 07/07/2026</div>
+  <div class="credit">Разработано Викторией Саламашко · v2 · 07/07/2026</div>
 
   <div class="topbar">
     <div>
@@ -174,12 +174,15 @@
 010400639606694721RU11120925345193548 240130400686 10ZIG122610 934000;Chapman Эклипс Нуар Голд;300"></textarea>
     <p class="hint">
       Формат строки: <code class="tag">КОД;Название;МРЦ</code> — название и МРЦ можно не указывать, тогда возьмутся значения по умолчанию сверху (если заданы).<br>
-      Коды с маркировкой (содержащие 240, 10, 17, 310 и т.д.) обрезаются автоматически.
+      Коды с маркировкой (содержащие 240, 10, 17, 310 и т.д.) обрезаются автоматически — в ШК попадают только <b>(01)</b> и <b>(21)</b>.<br>
+      Ограничения на количество кодов нет, но для стабильной работы браузера рекомендуется до ~500 кодов за один раз.
     </p>
 
+    <label style="margin-top:14px">Размер штрихкода</label>
+    <p class="hint" style="margin-top:0">Ширина — толщина одного штриха (модуля), высота — высота полос в пикселях. Подпись под ШК масштабируется вместе с размером.</p>
     <div class="options">
       <div class="opt-group">
-        <label>Ширина штрихкода</label>
+        <label>Ширина штриха (модуль)</label>
         <input type="number" id="opt-width" value="2" min="1" max="4" step="0.5">
       </div>
       <div class="opt-group">
@@ -223,14 +226,28 @@
         <li><b>Название по умолчанию</b> — подставляется, если в строке кода не указано своё название.</li>
         <li><b>МРЦ по умолчанию</b> — подставляется, если в строке кода не указана своя цена.</li>
         <li><b>Название архива</b> — имя ZIP-файла при скачивании (по умолчанию — «Barcodes»).</li>
-        <li><b>Ширина штрихкода / Высота (px)</b> — размер штрихкода на изображении; шрифт подписи и цены масштабируется вместе с этими значениями.</li>
       </ul>
 
+      <h3>Размер штрихкода</h3>
+      <ul>
+        <li><b>Ширина штриха (модуль)</b> — толщина одного самого тонкого штриха. Чем больше значение, тем шире весь штрихкод и тем легче он считывается сканером. Допустимо 1–4.</li>
+        <li><b>Высота (px)</b> — высота полос штрихкода в пикселях (40–200). По стандарту GS1-128 рекомендуемая высота при печати — не менее 32 мм.</li>
+        <li>Подпись под штрихкодом (человекочитаемый код) и строка МРЦ масштабируются автоматически вместе с размером — при увеличении ШК цифры остаются читаемыми.</li>
+      </ul>
+
+      <h3>Стандарт GS1-128</h3>
+      <p>Штрихкоды генерируются строго в формате <b>GS1-128</b> (он же UCC/EAN-128): сразу после старт-символа вставляется служебный символ <b>FNC1</b>, который отличает GS1-128 от обычного Code 128 и говорит сканеру, что дальше идут данные с идентификаторами применения (AI). Между полями переменной длины при необходимости добавляется разделитель FNC1. Такой код корректно распознаётся кассовыми GS1-сканерами с правильным разделением полей (01), (21) и др.</p>
+      <p>Ограничение стандарта: не более <b>48 символов данных</b> в одном штрихкоде (без учёта служебных символов). Если код длиннее — приложение покажет ошибку.</p>
+
       <h3>Маркировка (Честный знак)</h3>
-      <p>Если в строке после основного кода GS1 (01…21…) идёт код маркировки (с AI вида 240, 10, 17, 310 и т.п.), он обрезается автоматически — в штрихкод и подпись попадает только чистый GS1-код без маркировки.</p>
+      <p>Если в строке после основного кода GS1 (01…21…) идёт блок маркировки (с AI вида 240, 10, 17, 91, 93 и т.п.), он обрезается автоматически — в штрихкод и подпись попадает только розничный код <b>(01)</b> + <b>(21)</b>. Разбор идёт по структуре идентификаторов GS1, а не по случайному совпадению цифр, поэтому «10» или «17» внутри серийного номера не приводят к неверной обрезке.</p>
+      <p>Совет: если копируете данные прямо из сканера, служебные разделители полей сохраняются и обрезка проходит максимально точно.</p>
 
       <h3>Формат подписи (01)/(21)</h3>
-      <p>Под штрихкодом код показывается в читаемом виде — с круглыми скобками вокруг идентификаторов применения GS1, например: <code class="tag">(01)04006396098672(21)RU11120526160162049</code>. Скобки добавляются только для отображения на картинке — в сам штрихкод они не кодируются.</p>
+      <p>Под штрихкодом код показывается в читаемом виде — с круглыми скобками вокруг идентификаторов применения GS1, например: <code class="tag">(01)04006396098672(21)RU11120526160162049</code>. Скобки и служебные символы (FNC1) добавляются только для наглядности/кодирования — при сканировании и в подписи они не мешают.</p>
+
+      <h3>Количество кодов</h3>
+      <p>Жёсткого ограничения на количество кодов за один раз нет. Для стабильной работы браузера и разумного размера ZIP-архива рекомендуется генерировать до нескольких сотен кодов (~500) за один раз.</p>
 
       <h3>Результат</h3>
       <p>После нажатия «Сгенерировать» ниже появится предпросмотр всех штрихкодов. Кнопка «Скачать ZIP (PNG)» упаковывает все сгенерированные изображения в один архив.</p>
@@ -262,19 +279,122 @@ function toggleTheme() {
   }
 })();
 
-const STOP_AI = ['240', '10', '17', '310', '320', '37', '11', '13', '15', '400', '401', '402', '410', '411', '412', '420', '421', '91', '92', '93', '94', '95', '96', '97', '98', '99'];
+// ==== GS1-128: таблица идентификаторов применения (Application Identifiers) ====
+// Значение: число — фиксированная длина данных, 'var' — переменная (до GS1_MAX_VAR).
+const GS1_AI = {
+  '00':18, '01':14, '02':14,
+  '10':'var', '21':'var', '22':'var', '240':'var', '241':'var', '242':6, '243':'var',
+  '11':6, '12':6, '13':6, '15':6, '16':6, '17':6, '20':2,
+  '30':'var', '37':'var',
+  '250':'var', '251':'var', '253':'var', '254':'var',
+  '400':'var', '401':'var', '402':17, '403':'var',
+  '410':13, '411':13, '412':13, '413':13, '414':13, '415':13, '416':13, '417':13,
+  '420':'var', '421':'var', '422':3, '423':'var',
+  '8003':'var', '8004':'var', '8005':6, '8006':'var', '8008':'var',
+  '90':'var', '91':'var', '92':'var', '93':'var', '94':'var',
+  '95':'var', '96':'var', '97':'var', '98':'var', '99':'var'
+};
+const GS1_MAX_VAR = 20;   // макс. длина поля переменной длины
+const GS1_MAX_DATA = 48;  // макс. символов данных в одном символе GS1-128
+const FNC1 = String.fromCharCode(207);  // символ FNC1 для JsBarcode (CODE128)
 
-function trimCode(raw) {
-  let code = raw.replace(/[\x00-\x1F\x7F]/g, '').replace(/\s+/g, '').trim();
-  const minOffset = 18;
-  for (let ai of STOP_AI) {
-    let idx = code.indexOf(ai, minOffset);
-    if (idx !== -1) {
-      code = code.substring(0, idx);
-      break;
+// AI, с которых начинается блок маркировки «Честный знак» — для обрезки слитных кодов без разделителей.
+const MARKING_AI = ['240', '8005', '8006', '250', '251', '8003', '8004'];
+
+// Определить AI и ожидаемую длину его данных начиная с позиции i.
+function readAI(s, i) {
+  const p4 = s.substr(i, 4);
+  if (/^3[0-6]\d\d$/.test(p4)) return { ai: p4, len: 6 };       // вес/объём/размеры (310x–369x)
+  if (GS1_AI[p4] !== undefined) return { ai: p4, len: GS1_AI[p4] };
+  const p3 = s.substr(i, 3);
+  if (GS1_AI[p3] !== undefined) return { ai: p3, len: GS1_AI[p3] };
+  const p2 = s.substr(i, 2);
+  if (GS1_AI[p2] !== undefined) return { ai: p2, len: GS1_AI[p2] };
+  return null;
+}
+
+// Разобрать входную строку в массив {ai, value}. Управляющие символы и пробелы трактуются
+// как разделители полей (FNC1). Нераспознанный «хвост» после уже разобранных полей игнорируется.
+function parseGS1(raw) {
+  const GS = '\x1D';
+  let s = raw.replace(/[\x00-\x1F\x7F ]+/g, GS).replace(/^\x1D+|\x1D+$/g, '');
+  const ais = [];
+  let i = 0;
+  while (i < s.length) {
+    if (s[i] === GS) { i++; continue; }
+    const t = readAI(s, i);
+    if (!t) {
+      if (ais.length > 0) break;   // дальше нераспознанные данные (маркировка) — игнорируем
+      return { ais, error: 'Строка не является кодом GS1 (не начинается с известного AI)' };
     }
+    i += t.ai.length;
+    let value;
+    if (t.len === 'var') {
+      let j = i;
+      while (j < s.length && s[j] !== GS) j++;
+      value = s.substring(i, j);
+      i = j;
+    } else {
+      value = s.substr(i, t.len);
+      if (value.length < t.len) return { ais, error: 'AI (' + t.ai + '): требуется ' + t.len + ' символов' };
+      i += t.len;
+    }
+    ais.push({ ai: t.ai, value: value });
   }
-  return code;
+  return { ais: ais, error: null };
+}
+
+// Для розничного ШК оставляем только (01) и (21).
+function extractRetail(raw) {
+  const parsed = parseGS1(raw);
+  // Если разделителей не было, поле (21)/(10) могло «поглотить» блок маркировки — отрезаем его.
+  const ais = parsed.ais.map(function(f) {
+    if (f.ai === '21' || f.ai === '10') {
+      for (const m of MARKING_AI) {
+        const idx = f.value.indexOf(m, 1);
+        if (idx > 0) return { ai: f.ai, value: f.value.substring(0, idx) };
+      }
+    }
+    return f;
+  });
+  const keep = ais.filter(function(f) { return f.ai === '01' || f.ai === '21'; });
+  return { ais: keep.length ? keep : ais, error: keep.length ? null : parsed.error };
+}
+
+// Проверка соответствия GS1: длины полей и суммарный лимит данных.
+function validateGS1(ais) {
+  if (!ais.length) return 'не распознан ни один идентификатор GS1';
+  const dataLen = ais.reduce(function(n, f) { return n + f.ai.length + f.value.length; }, 0);
+  if (dataLen > GS1_MAX_DATA) return 'превышен лимит ' + GS1_MAX_DATA + ' символов данных GS1-128';
+  for (const f of ais) {
+    const t = readAI(f.ai + f.value, 0);
+    if (t && t.len !== 'var' && f.value.length !== t.len)
+      return 'AI (' + f.ai + ') должен содержать ' + t.len + ' символов';
+    if (t && t.len === 'var' && (f.value.length < 1 || f.value.length > GS1_MAX_VAR))
+      return 'AI (' + f.ai + '): длина 1…' + GS1_MAX_VAR + ' символов';
+  }
+  return null;
+}
+
+// Данные для JsBarcode: поля подряд + FNC1 после поля переменной длины (кроме последнего).
+function buildBarcodeData(ais) {
+  let data = '';
+  ais.forEach(function(f, idx) {
+    data += f.ai + f.value;
+    const t = readAI(f.ai + f.value, 0);
+    if (t && t.len === 'var' && idx < ais.length - 1) data += FNC1;
+  });
+  return data;
+}
+
+// Человекочитаемый текст под ШК: (AI)данные(AI)данные — только для подписи, не в самом коде.
+function formatGs1Display(ais) {
+  return ais.map(function(f) { return '(' + f.ai + ')' + f.value; }).join('');
+}
+
+// «Сырой» вид без скобок (для имени файла и сравнения с исходной строкой).
+function plainGs1(ais) {
+  return ais.map(function(f) { return f.ai + f.value; }).join('');
 }
 
 function sanitizeFilename(str) {
@@ -286,13 +406,6 @@ function todayStr() {
   const d = new Date();
   const pad = n => String(n).padStart(2, '0');
   return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-}
-
-function formatGs1Display(code) {
-  if (code.startsWith('01') && code.length >= 18 && code.substring(16, 18) === '21') {
-    return '(01)' + code.substring(2, 16) + '(21)' + code.substring(18);
-  }
-  return code;
 }
 
 function parseLine(line, defaultName, defaultPrice) {
@@ -332,25 +445,34 @@ async function generateBarcodes() {
   for (let i = 0; i < lines.length; i++) {
     const original = lines[i];
     const { rawCode, name, price } = parseLine(original, defaultName, defaultPrice);
-    const trimmed = trimCode(rawCode);
     const priceLabel = price ? price + ' руб.' : '';
 
     try {
-      const canvas = await buildLabelCanvas(trimmed, name, priceLabel, barWidth, barHeight);
+      const { ais, error } = extractRetail(rawCode);
+      if (error) throw new Error(error);
+      const vErr = validateGS1(ais);
+      if (vErr) throw new Error(vErr);
+
+      const barcodeData = buildBarcodeData(ais);   // данные с FNC1 для GS1-128
+      const hri = formatGs1Display(ais);           // подпись (01)…(21)…
+      const plain = plainGs1(ais);                 // без скобок
+
+      const canvas = await buildLabelCanvas(barcodeData, hri, name, priceLabel, barWidth, barHeight);
       const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
       const namePart = name ? sanitizeFilename(name) + '_' : '';
-      const filenameBase = namePart + String(i + 1).padStart(3, '0') + '_' + trimmed.substring(0, 14);
+      const filenameBase = namePart + String(i + 1).padStart(3, '0') + '_' + plain.substring(0, 16);
 
-      generatedItems.push({ filename: filenameBase, blob: pngBlob, trimmed, original, name, priceLabel });
+      generatedItems.push({ filename: filenameBase, blob: pngBlob, plain, original, name, priceLabel });
 
+      const cleanRaw = rawCode.replace(/[\x00-\x1F\x7F]/g, '').replace(/\s+/g, '');
       const item = document.createElement('div');
       item.className = 'barcode-item';
       const imgUrl = URL.createObjectURL(pngBlob);
       item.innerHTML = `<img class="preview-img" src="${imgUrl}">
         <div class="barcode-meta">
           ${name ? `<div class="label">${name}${priceLabel ? ' — ' + priceLabel : ''}</div>` : ''}
-          <div><b>${formatGs1Display(trimmed)}</b></div>
-          ${(() => { const cleanRaw = rawCode.replace(/[\x00-\x1F\x7F]/g, ''); return cleanRaw.replace(/\s+/g,'') !== trimmed ? `<div class="original">Исходный: ${cleanRaw.substring(0, 60)}${cleanRaw.length > 60 ? '...' : ''}</div>` : ''; })()}
+          <div><b>${hri}</b></div>
+          ${cleanRaw !== plain ? `<div class="original">Исходный: ${cleanRaw.substring(0, 60)}${cleanRaw.length > 60 ? '...' : ''}</div>` : ''}
         </div>`;
       grid.appendChild(item);
 
@@ -375,12 +497,13 @@ async function generateBarcodes() {
   setStatus(`Готово: ${generatedItems.length} штрихкодов сгенерировано${errors > 0 ? `, ${errors} ошибок` : ''}.`, 'success');
 }
 
-function buildLabelCanvas(code, name, priceLabel, barWidth, barHeight) {
+function buildLabelCanvas(barcodeData, hri, name, priceLabel, barWidth, barHeight) {
   return new Promise((resolve, reject) => {
     try {
       const barcodeCanvas = document.createElement('canvas');
-      JsBarcode(barcodeCanvas, code, {
+      JsBarcode(barcodeCanvas, barcodeData, {
         format: 'CODE128',
+        ean128: true,        // GS1-128: FNC1 после старт-символа
         lineColor: '#000',
         background: '#fff',
         width: barWidth,
@@ -420,7 +543,7 @@ function buildLabelCanvas(code, name, priceLabel, barWidth, barHeight) {
       ctx.fillStyle = '#000';
       ctx.font = `${codeFontSize}px monospace`;
       ctx.textAlign = 'center';
-      ctx.fillText(formatGs1Display(code), finalCanvas.width / 2, yCursor + codeFontSize);
+      ctx.fillText(hri, finalCanvas.width / 2, yCursor + codeFontSize);
       yCursor += codeTextHeight;
 
       if (priceLabel) {
