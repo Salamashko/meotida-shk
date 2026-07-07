@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Генератор линейных ШК GS1-128 — Meotida</title>
+<title>Генератор линейных ШК GS1-128</title>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
@@ -32,52 +32,52 @@
     --muted:  #64748B;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; transition: background .2s, color .2s; }
-  .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 17px; transition: background .2s, color .2s; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
   .credit {
-    font-size: 11px; color: var(--muted); text-align: right; margin-bottom: 10px;
+    font-size: 13px; color: var(--muted); text-align: right; margin-bottom: 10px;
   }
 
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 12px; }
   h1.grad-text {
-    font-size: 22px; font-weight: 800;
+    font-size: 25px; font-weight: 800;
     background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .subtitle { font-size: 15px; color: var(--muted); margin-bottom: 20px; }
 
   .theme-toggle {
     display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
     padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--bg2); font-size: 12px; color: var(--text); user-select: none;
+    background: var(--bg2); font-size: 14px; color: var(--text); user-select: none;
   }
   .theme-toggle:hover { border-color: var(--cyan); }
 
   .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-  label { font-weight: 700; font-size: 14px; display: block; margin-bottom: 6px; color: var(--text); }
+  label { font-weight: 700; font-size: 16px; display: block; margin-bottom: 6px; color: var(--text); }
 
   textarea {
     width: 100%; height: 190px; padding: 10px; border: 1px solid var(--border);
-    border-radius: 10px; font-family: monospace; font-size: 13px; resize: vertical;
+    border-radius: 10px; font-family: monospace; font-size: 15px; resize: vertical;
     background: var(--bg2); color: var(--text);
   }
   input[type=text], input[type=number] {
-    padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; width: 100%;
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; width: 100%;
     background: var(--bg2); color: var(--text); font-family: var(--font);
   }
 
   .product-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
   .product-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
-  .product-group label { font-weight: 400; font-size: 13px; margin: 0; color: var(--muted); }
+  .product-group label { font-weight: 400; font-size: 15px; margin: 0; color: var(--muted); }
 
   .options { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px; align-items: flex-end; }
   .opt-group { display: flex; flex-direction: column; gap: 4px; }
-  .opt-group label { font-weight: 400; font-size: 13px; margin: 0; color: var(--muted); }
+  .opt-group label { font-weight: 400; font-size: 15px; margin: 0; color: var(--muted); }
   .opt-group input[type=number] { width: 120px; }
 
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    border-radius: 10px; padding: 11px 18px; font-size: 13px; font-weight: 700;
+    border-radius: 10px; padding: 11px 18px; font-size: 15px; font-weight: 700;
     cursor: pointer; font-family: var(--font); border: 1px solid var(--border);
     color: var(--text); background: var(--bg2); transition: border-color .18s;
   }
@@ -86,27 +86,27 @@
   .btn-grad:disabled { opacity: .5; cursor: default; }
   .btn-clear { background: var(--bg2); }
 
-  .status { font-size: 13px; margin-top: 10px; color: var(--muted); }
+  .status { font-size: 15px; margin-top: 10px; color: var(--muted); }
   .status.error { color: var(--danger); }
   .status.success { color: var(--success); }
 
   #preview-area { display: none; }
   .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .preview-header h2 { font-size: 16px; color: var(--text); }
+  .preview-header h2 { font-size: 18px; color: var(--text); }
   .barcodes-grid { display: flex; flex-direction: column; gap: 12px; }
   .barcode-item {
     border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px;
     background: var(--bg2); display: flex; align-items: center; gap: 16px;
   }
-  .barcode-meta { font-size: 11px; color: var(--muted); word-break: break-all; }
-  .barcode-meta .original { color: var(--muted); font-size: 10px; opacity: .7; }
-  .barcode-meta .label { color: var(--text); font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .barcode-meta { font-size: 13px; color: var(--muted); word-break: break-all; }
+  .barcode-meta .original { color: var(--muted); font-size: 12px; opacity: .7; }
+  .barcode-meta .label { color: var(--text); font-weight: 700; font-size: 15px; margin-bottom: 4px; }
 
   .progress { height: 6px; background: var(--border); border-radius: 4px; margin-top: 8px; overflow: hidden; display: none; }
   .progress-bar { height: 100%; background: var(--grad); border-radius: 4px; transition: width .2s; }
 
-  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
-  code.tag { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--cyan); padding: 1px 6px; border-radius: 6px; font-size: 12px; }
+  .hint { font-size: 14px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  code.tag { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--cyan); padding: 1px 6px; border-radius: 6px; font-size: 14px; }
   img.preview-img { max-height: 120px; border-radius: 8px; }
 </style>
 </head>
@@ -122,7 +122,7 @@
       <span id="theme-icon">🌙</span><span id="theme-label">Тёмная</span>
     </div>
   </div>
-  <p class="subtitle">Для сетей розничной торговли Meotida. Поддерживает коды с маркировкой и без, разное название/МРЦ для каждой строки.</p>
+  <p class="subtitle">Для сетей розничной торговли. Поддерживает коды с маркировкой и без, разное название/МРЦ для каждой строки.</p>
 
   <div class="card">
     <div class="product-row">
@@ -225,6 +225,13 @@ function todayStr() {
   return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
 }
 
+function formatGs1Display(code) {
+  if (code.startsWith('01') && code.length >= 18 && code.substring(16, 18) === '21') {
+    return '(01)' + code.substring(2, 16) + '(21)' + code.substring(18);
+  }
+  return code;
+}
+
 function parseLine(line, defaultName, defaultPrice) {
   const parts = line.split(';').map(p => p.trim());
   const rawCode = parts[0];
@@ -279,7 +286,7 @@ async function generateBarcodes() {
       item.innerHTML = `<img class="preview-img" src="${imgUrl}">
         <div class="barcode-meta">
           ${name ? `<div class="label">${name}${priceLabel ? ' — ' + priceLabel : ''}</div>` : ''}
-          <div><b>${trimmed}</b></div>
+          <div><b>${formatGs1Display(trimmed)}</b></div>
           ${rawCode.replace(/\s+/g,'') !== trimmed ? `<div class="original">Исходный: ${rawCode.substring(0, 60)}${rawCode.length > 60 ? '...' : ''}</div>` : ''}
         </div>`;
       grid.appendChild(item);
@@ -311,24 +318,25 @@ function buildLabelCanvas(code, name, priceLabel, barWidth, barHeight) {
       const barcodeCanvas = document.createElement('canvas');
       JsBarcode(barcodeCanvas, code, {
         format: 'CODE128',
-        ean128: true,
         lineColor: '#000',
         background: '#fff',
         width: barWidth,
         height: barHeight,
-        displayValue: true,
-        fontSize: 11,
-        margin: 8,
-        textMargin: 4,
-        font: 'Arial'
+        displayValue: false,
+        margin: 8
       });
 
+      const codeFontSize = Math.max(12, Math.round(barHeight * 0.18 + barWidth * 2));
+      const titleFontSize = Math.max(14, Math.round(codeFontSize * 0.95));
+      const priceFontSize = Math.max(15, Math.round(codeFontSize));
+
       const padding = 10;
-      const titleHeight = name ? 22 : 0;
-      const priceHeight = priceLabel ? 20 : 0;
+      const titleHeight = name ? titleFontSize + 10 : 0;
+      const codeTextHeight = codeFontSize + 12;
+      const priceHeight = priceLabel ? priceFontSize + 10 : 0;
       const finalCanvas = document.createElement('canvas');
       finalCanvas.width = barcodeCanvas.width + padding * 2;
-      finalCanvas.height = barcodeCanvas.height + titleHeight + priceHeight + padding * 2;
+      finalCanvas.height = barcodeCanvas.height + titleHeight + codeTextHeight + priceHeight + padding * 2;
 
       const ctx = finalCanvas.getContext('2d');
       ctx.fillStyle = '#fff';
@@ -337,20 +345,26 @@ function buildLabelCanvas(code, name, priceLabel, barWidth, barHeight) {
       let yCursor = padding;
       if (name) {
         ctx.fillStyle = '#000';
-        ctx.font = 'bold 14px Arial';
+        ctx.font = `bold ${titleFontSize}px Arial`;
         ctx.textAlign = 'center';
-        ctx.fillText(name, finalCanvas.width / 2, yCursor + 14);
+        ctx.fillText(name, finalCanvas.width / 2, yCursor + titleFontSize);
         yCursor += titleHeight;
       }
 
       ctx.drawImage(barcodeCanvas, padding, yCursor);
       yCursor += barcodeCanvas.height;
 
+      ctx.fillStyle = '#000';
+      ctx.font = `${codeFontSize}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(formatGs1Display(code), finalCanvas.width / 2, yCursor + codeFontSize);
+      yCursor += codeTextHeight;
+
       if (priceLabel) {
         ctx.fillStyle = '#000';
-        ctx.font = 'bold 15px Arial';
+        ctx.font = `bold ${priceFontSize}px Arial`;
         ctx.textAlign = 'center';
-        ctx.fillText('МРЦ: ' + priceLabel, finalCanvas.width / 2, yCursor + 16);
+        ctx.fillText('МРЦ: ' + priceLabel, finalCanvas.width / 2, yCursor + priceFontSize);
       }
 
       resolve(finalCanvas);
