@@ -108,6 +108,22 @@
   .hint { font-size: 14px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
   code.tag { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--cyan); padding: 1px 6px; border-radius: 6px; font-size: 14px; }
   img.preview-img { max-height: 120px; border-radius: 8px; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    padding: 10px 18px; font-size: 15px; font-weight: 700; cursor: pointer;
+    background: none; border: none; color: var(--muted); font-family: var(--font);
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--cyan); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .help-content h3 { font-size: 17px; margin: 18px 0 8px; color: var(--text); }
+  .help-content h3:first-child { margin-top: 0; }
+  .help-content p, .help-content li { font-size: 15px; line-height: 1.6; color: var(--text); }
+  .help-content ul, .help-content ol { padding-left: 22px; margin: 6px 0; }
+  .help-content code.tag { display: inline-block; margin: 2px 0; }
 </style>
 </head>
 <body>
@@ -124,6 +140,12 @@
   </div>
   <p class="subtitle">Для сетей розничной торговли. Поддерживает коды с маркировкой и без, разное название/МРЦ для каждой строки.</p>
 
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-generator" onclick="switchTab('generator')">Генератор</button>
+    <button class="tab-btn" id="tab-btn-help" onclick="switchTab('help')">Как пользоваться</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-generator">
   <div class="card">
     <div class="product-row">
       <div class="product-group">
@@ -180,9 +202,50 @@
     </div>
     <div id="barcodes-grid" class="barcodes-grid"></div>
   </div>
+  </div>
+
+  <div class="tab-panel" id="tab-help">
+    <div class="card help-content">
+      <h3>Что делает приложение</h3>
+      <p>Генерирует линейные штрихкоды GS1-128 (CODE128) по списку кодов: рисует изображение штрихкода с подписью кода, названием товара и МРЦ, и позволяет скачать все картинки одним ZIP-архивом.</p>
+
+      <h3>Как ввести коды</h3>
+      <p>Вставьте коды в поле «Список кодов» — один код на строку. Строка может быть в одном из трёх форматов:</p>
+      <ol>
+        <li><b>Только код:</b><br><code class="tag">010400639609867221RU11120526160162049</code></li>
+        <li><b>Код + название + МРЦ</b> (через точку с запятой):<br><code class="tag">010400639609867221RU11120526160162049;Chapman Грин OP;285</code></li>
+        <li><b>Код с маркировкой</b> (лишний хвост обрежется автоматически) + название + МРЦ:<br><code class="tag">010400639606694721RU11120925345193548 240130400686 10ZIG122610 934000;Chapman Эклипс Нуар Голд;300</code></li>
+      </ol>
+      <p>Если название или МРЦ не указаны в строке — используются значения по умолчанию сверху формы (если заданы).</p>
+
+      <h3>Поля формы</h3>
+      <ul>
+        <li><b>Название по умолчанию</b> — подставляется, если в строке кода не указано своё название.</li>
+        <li><b>МРЦ по умолчанию</b> — подставляется, если в строке кода не указана своя цена.</li>
+        <li><b>Название архива</b> — имя ZIP-файла при скачивании (по умолчанию — «Barcodes»).</li>
+        <li><b>Ширина штрихкода / Высота (px)</b> — размер штрихкода на изображении; шрифт подписи и цены масштабируется вместе с этими значениями.</li>
+      </ul>
+
+      <h3>Маркировка (Честный знак)</h3>
+      <p>Если в строке после основного кода GS1 (01…21…) идёт код маркировки (с AI вида 240, 10, 17, 310 и т.п.), он обрезается автоматически — в штрихкод и подпись попадает только чистый GS1-код без маркировки.</p>
+
+      <h3>Формат подписи (01)/(21)</h3>
+      <p>Под штрихкодом код показывается в читаемом виде — с круглыми скобками вокруг идентификаторов применения GS1, например: <code class="tag">(01)04006396098672(21)RU11120526160162049</code>. Скобки добавляются только для отображения на картинке — в сам штрихкод они не кодируются.</p>
+
+      <h3>Результат</h3>
+      <p>После нажатия «Сгенерировать» ниже появится предпросмотр всех штрихкодов. Кнопка «Скачать ZIP (PNG)» упаковывает все сгенерированные изображения в один архив.</p>
+    </div>
+  </div>
 </div>
 
 <script>
+function switchTab(name) {
+  document.getElementById('tab-generator').classList.toggle('active', name === 'generator');
+  document.getElementById('tab-help').classList.toggle('active', name === 'help');
+  document.getElementById('tab-btn-generator').classList.toggle('active', name === 'generator');
+  document.getElementById('tab-btn-help').classList.toggle('active', name === 'help');
+}
+
 function toggleTheme() {
   const html = document.documentElement;
   const isDark = html.getAttribute('data-theme') === 'dark';
