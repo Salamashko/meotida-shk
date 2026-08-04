@@ -298,9 +298,6 @@ const GS1_MAX_VAR = 20;   // макс. длина поля переменной 
 const GS1_MAX_DATA = 48;  // макс. символов данных в одном символе GS1-128
 const FNC1 = String.fromCharCode(207);  // символ FNC1 для JsBarcode (CODE128)
 
-// AI, с которых начинается блок маркировки «Честный знак» — для обрезки слитных кодов без разделителей.
-const MARKING_AI = ['240', '8005', '8006', '250', '251', '8003', '8004'];
-
 // Определить AI и ожидаемую длину его данных начиная с позиции i.
 function readAI(s, i) {
   const p4 = s.substr(i, 4);
@@ -347,18 +344,8 @@ function parseGS1(raw) {
 // Для розничного ШК оставляем только (01) и (21).
 function extractRetail(raw) {
   const parsed = parseGS1(raw);
-  // Если разделителей не было, поле (21)/(10) могло «поглотить» блок маркировки — отрезаем его.
-  const ais = parsed.ais.map(function(f) {
-    if (f.ai === '21' || f.ai === '10') {
-      for (const m of MARKING_AI) {
-        const idx = f.value.indexOf(m, 1);
-        if (idx > 0) return { ai: f.ai, value: f.value.substring(0, idx) };
-      }
-    }
-    return f;
-  });
-  const keep = ais.filter(function(f) { return f.ai === '01' || f.ai === '21'; });
-  return { ais: keep.length ? keep : ais, error: keep.length ? null : parsed.error };
+  const keep = parsed.ais.filter(function(f) { return f.ai === '01' || f.ai === '21'; });
+  return { ais: keep.length ? keep : parsed.ais, error: keep.length ? null : parsed.error };
 }
 
 // Проверка соответствия GS1: длины полей и суммарный лимит данных.
